@@ -1,0 +1,28 @@
+# Build the Go Binary.
+FROM golang:1.21 as build_cdr-api
+ENV CGO_ENABLED 0
+ARG BUILD_REF
+
+# Copy the source code into the container.
+COPY . /service
+
+# Build the service binary.
+WORKDIR /service/app/services/cdr-api
+RUN go build -ldflags "-X main.build=${BUILD_REF}"
+
+# Run the Go Binary in Alpine.
+FROM alpine:3.18
+ARG BUILD_DATE
+ARG BUILD_REF
+RUN addgroup -g 1000 -S cdr && \
+    adduser -u 1000 -h /service -G cdr -S cdr
+COPY --from=build_cdr-api --chown=cdr:cdr /service/app/services/cdr-api/cdr-api /service/cdr-api
+WORKDIR /service
+USER cdr
+CMD ["./cdr-api"]
+
+LABEL org.opencontainers.image.created="${BUILD_DATE}" \
+      org.opencontainers.image.title="cdr-api" \
+      org.opencontainers.image.authors="Dhon <drmanalo@outlook.com>, Shankar <shankar@gmail.com>" \
+      org.opencontainers.image.revision="${BUILD_REF}" \
+      org.opencontainers.image.vendor="Ardan Labs"
