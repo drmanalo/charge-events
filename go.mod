@@ -3,6 +3,7 @@ module github.com/drmanalo/charge-events
 go 1.21
 
 require (
+	github.com/ardanlabs/conf/v3 v3.1.6 // indirect
 	github.com/ardanlabs/service v0.0.0-20230813194513-b43a2d6e19bf // indirect
 	github.com/dimfeld/httptreemux/v5 v5.5.0 // indirect
 	github.com/felixge/httpsnoop v1.0.3 // indirect

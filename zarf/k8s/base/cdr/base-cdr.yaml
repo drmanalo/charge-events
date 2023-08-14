@@ -27,3 +27,9 @@ spec:
       containers:
       - name: cdr-api
         image: service-image
+
+        env:
+        - name: GOMAXPROCS
+          valueFrom:
+            resourceFieldRef:
+              resource: limits.cpu

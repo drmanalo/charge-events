@@ -14,12 +14,17 @@ import (
 
 // Logger represents a logger for logging information
 type Logger struct {
-	handler slog.Handler
+	handler     slog.Handler
+	traceIDFunc TraceIDFunc
 }
 
+// TraceIDFunc represents a function that can return the trace id from
+// the specified context
+type TraceIDFunc func(ctx context.Context) string
+
 // New constructs a new log for application use
-func New(w io.Writer, serviceName string) *Logger {
-	return new(w, LevelInfo, serviceName)
+func New(w io.Writer, serviceName string, traceIDFunc TraceIDFunc) *Logger {
+	return new(w, LevelInfo, serviceName, traceIDFunc)
 }
 
 // Info logs at LevelInfo with the given context
@@ -30,6 +35,26 @@ func (log *Logger) Info(ctx context.Context, msg string, args ...any) {
 // Infoc logs the information at the specified call stack position
 func (log *Logger) Infoc(ctx context.Context, caller int, msg string, args ...any) {
 	log.write(ctx, LevelInfo, caller, msg, args...)
+}
+
+// Warn logs at LevelWarn with the given context
+func (log *Logger) Warn(ctx context.Context, msg string, args ...any) {
+	log.write(ctx, LevelWarn, 3, msg, args...)
+}
+
+// Warnc logs the information at the specified call stack position
+func (log *Logger) Warnc(ctx context.Context, caller int, msg string, args ...any) {
+	log.write(ctx, LevelWarn, caller, msg, args...)
+}
+
+// Error logs at LevelError with the given context
+func (log *Logger) Error(ctx context.Context, msg string, args ...any) {
+	log.write(ctx, LevelError, 3, msg, args...)
+}
+
+// Errorc logs the information at the specified call stack position
+func (log *Logger) Errorc(ctx context.Context, caller int, msg string, args ...any) {
+	log.write(ctx, LevelError, caller, msg, args...)
 }
 
 func (log *Logger) write(ctx context.Context, level Level, caller int, msg string, args ...any) {
@@ -52,7 +77,7 @@ func (log *Logger) write(ctx context.Context, level Level, caller int, msg strin
 
 // =============================================================================
 
-func new(w io.Writer, minLevel Level, serviceName string) *Logger {
+func new(w io.Writer, minLevel Level, serviceName string, traceIDFunc TraceIDFunc) *Logger {
 
 	// Convert the file name to just the name.ext when this key/value will be logged
 	f := func(groups []string, a slog.Attr) slog.Attr {
@@ -78,6 +103,7 @@ func new(w io.Writer, minLevel Level, serviceName string) *Logger {
 	handler = handler.WithAttrs(attrs)
 
 	return &Logger{
-		handler: handler,
+		handler:     handler,
+		traceIDFunc: traceIDFunc,
 	}
 }

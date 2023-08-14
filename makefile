@@ -5,38 +5,6 @@ SHELL_PATH = /bin/ash
 SHELL = $(if $(wildcard $(SHELL_PATH)),/bin/ash,/bin/bash)
 
 # ==============================================================================
-# Running from within k8s/kind
-
-dev-up-local:
-	kind create cluster \
-		--image $(KIND) \
-		--name $(KIND_CLUSTER) \
-		--config zarf/k8s/dev/kind-config.yaml
-
-	kubectl wait --timeout=120s --namespace=local-path-storage --for=condition=Available deployment/local-path-provisioner
-
-	kind load docker-image $(TELEPRESENCE) --name $(KIND_CLUSTER)
-	kind load docker-image $(POSTGRES) --name $(KIND_CLUSTER)
-	kind load docker-image $(VAULT) --name $(KIND_CLUSTER)
-	kind load docker-image $(GRAFANA) --name $(KIND_CLUSTER)
-	kind load docker-image $(PROMETHEUS) --name $(KIND_CLUSTER)
-	kind load docker-image $(TEMPO) --name $(KIND_CLUSTER)
-	kind load docker-image $(LOKI) --name $(KIND_CLUSTER)
-	kind load docker-image $(PROMTAIL) --name $(KIND_CLUSTER)
-
-dev-up: dev-up-local
-	telepresence --context=kind-$(KIND_CLUSTER) helm install --request-timeout 2m 
-	telepresence --context=kind-$(KIND_CLUSTER) connect
-
-dev-down-local:
-	kind delete cluster --name $(KIND_CLUSTER)
-
-dev-down:
-	telepresence quit -s
-	kind delete cluster --name $(KIND_CLUSTER)-brew-arm64
-
-
-# ==============================================================================
 # Define dependencies
 
 GOLANG          := golang:1.21
@@ -106,7 +74,7 @@ all: service
 
 service:
 	docker build \
-		-f zarf/docker/dockerfile.service \Then follow instructions above for Telepresence.
+		-f zarf/docker/dockerfile.service \
 		-t $(SERVICE_IMAGE) \
 		--build-arg BUILD_REF=$(VERSION) \
 		--build-arg BUILD_DATE=`date -u +"%Y-%m-%dT%H:%M:%SZ"` \
@@ -144,6 +112,37 @@ dev-down:
 	telepresence quit -s
 	kind delete cluster --name $(KIND_CLUSTER)
 	
+
+# ==============================================================================
+
+dev-load:
+	kind load docker-image $(SERVICE_IMAGE) --name $(KIND_CLUSTER)
+
+dev-apply:
+	kustomize build zarf/k8s/dev/cdr | kubectl apply -f -
+	kubectl wait pods --namespace=$(NAMESPACE) --selector app=$(APP) --for=condition=Ready
+
+dev-restart:
+	kubectl rollout restart deployment $(APP) --namespace=$(NAMESPACE)
+
+dev-update: all dev-load dev-restart
+
+dev-update-apply: all dev-load dev-apply
+	
+
+# ==============================================================================
+
+dev-logs:
+	kubectl logs --namespace=$(NAMESPACE) -l app=$(APP) --all-containers=true -f --tail=100 --max-log-requests=6
+
+dev-status:
+	kubectl get nodes -o wide
+	kubectl get svc -o wide
+	kubectl get pods -o wide --watch --all-namespaces
+
+dev-describe-cdr:
+	kubectl describe pod --namespace=$(NAMESPACE) -l app=$(APP)
+
 
 # ==============================================================================
 
