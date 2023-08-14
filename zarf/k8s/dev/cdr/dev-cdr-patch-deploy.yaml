@@ -1,0 +1,24 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: cdr
+  namespace: cdr-system
+
+spec:
+  selector:
+    matchLabels:
+      app: cdr
+
+  replicas: 1
+
+  strategy:
+    type: Recreate
+
+  template:
+    metadata:
+      labels:
+        app: cdr
+
+    spec:
+      dnsPolicy: ClusterFirstWithHostNet
+      hostNetwork: true

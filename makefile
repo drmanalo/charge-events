@@ -1,5 +1,9 @@
 # Deploy First Mentality
 
+# Check to see if we can use ash, in Alpine images, or default to BASH.
+SHELL_PATH = /bin/ash
+SHELL = $(if $(wildcard $(SHELL_PATH)),/bin/ash,/bin/bash)
+
 # ==============================================================================
 # Running from within k8s/kind
 
@@ -108,6 +112,38 @@ service:
 		--build-arg BUILD_DATE=`date -u +"%Y-%m-%dT%H:%M:%SZ"` \
 		.
 
+
+# ==============================================================================
+# Running from within k8s/kind
+
+dev-up-local:
+	kind create cluster \
+		--image $(KIND) \
+		--name $(KIND_CLUSTER) \
+		--config zarf/k8s/dev/kind-config.yaml
+
+	kubectl wait --timeout=120s --namespace=local-path-storage --for=condition=Available deployment/local-path-provisioner
+
+	kind load docker-image $(TELEPRESENCE) --name $(KIND_CLUSTER)
+	kind load docker-image $(POSTGRES) --name $(KIND_CLUSTER)
+	kind load docker-image $(VAULT) --name $(KIND_CLUSTER)
+	kind load docker-image $(GRAFANA) --name $(KIND_CLUSTER)
+	kind load docker-image $(PROMETHEUS) --name $(KIND_CLUSTER)
+	kind load docker-image $(TEMPO) --name $(KIND_CLUSTER)
+	kind load docker-image $(LOKI) --name $(KIND_CLUSTER)
+	kind load docker-image $(PROMTAIL) --name $(KIND_CLUSTER)
+
+dev-up: dev-up-local
+	telepresence --context=kind-$(KIND_CLUSTER) helm install --request-timeout 2m 
+	telepresence --context=kind-$(KIND_CLUSTER) connect
+
+dev-down-local:
+	kind delete cluster --name $(KIND_CLUSTER)
+
+dev-down:
+	telepresence quit -s
+	kind delete cluster --name $(KIND_CLUSTER)
+	
 
 # ==============================================================================
 

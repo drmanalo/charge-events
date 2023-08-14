@@ -11,8 +11,10 @@ import (
 	"github.com/drmanalo/charge-events/business/sys/logger"
 )
 
+var build = "develop"
+
 func main() {
-	log := logger.New(os.Stdout, "CHARGE-RECORD")
+	log := logger.New(os.Stdout, "CDR-API")
 
 	if err := run(log); err != nil {
 		fmt.Println(err)
@@ -26,7 +28,7 @@ func run(log *logger.Logger) error {
 	// -------------------------------------------------------------------------
 	// GOMAXPROCS
 
-	log.Info(ctx, "startup", "GOMAXPROCS", runtime.GOMAXPROCS(0))
+	log.Info(ctx, "startup", "GOMAXPROCS", runtime.GOMAXPROCS(0), "build", build)
 
 	// -------------------------------------------------------------------------
 
