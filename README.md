@@ -29,8 +29,8 @@ Then follow below instructions for Telepresence.
 
 Unfortunately you can't use brew to install telepresence because you will receive a bad binary. Please follow these instruction.
 ```
-	$ sudo curl -fL https://app.getambassador.io/download/tel2/linux/amd64/latest/telepresence -o /usr/local/bin/telepresence
-	$ sudo chmod a+x /usr/local/bin/telepresence
+$ sudo curl -fL https://app.getambassador.io/download/tel2/linux/amd64/latest/telepresence -o /usr/local/bin/telepresence
+$ sudo chmod a+x /usr/local/bin/telepresence
 ```
 Restart your wsl environment.
 
@@ -41,7 +41,7 @@ Restart your wsl environment.
 
 ### M1 Mac Users ONLY - Uninstall Telepresence If Installed Intel Version
 ```
-   $ sudo rm -rf /Library/Developer/CommandLineTools
-   $ sudo xcode-select --install
+$ sudo rm -rf /Library/Developer/CommandLineTools
+$ sudo xcode-select --install
 ```   
 Then install it with brew (arm64)
