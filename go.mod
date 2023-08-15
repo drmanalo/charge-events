@@ -5,10 +5,12 @@ go 1.21
 require (
 	github.com/ardanlabs/conf/v3 v3.1.6 // indirect
 	github.com/ardanlabs/service v0.0.0-20230813194513-b43a2d6e19bf // indirect
+	github.com/dimfeld/httptreemux v5.0.1+incompatible // indirect
 	github.com/dimfeld/httptreemux/v5 v5.5.0 // indirect
 	github.com/felixge/httpsnoop v1.0.3 // indirect
 	github.com/go-logr/logr v1.2.4 // indirect
 	github.com/go-logr/stdr v1.2.2 // indirect
+	github.com/google/uuid v1.3.0 // indirect
 	go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp v0.42.0 // indirect
 	go.opentelemetry.io/otel v1.16.0 // indirect
 	go.opentelemetry.io/otel/metric v1.16.0 // indirect

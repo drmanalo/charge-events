@@ -4,6 +4,7 @@ resources:
 - ../../base/cdr/
 patches:
 - path: ./dev-cdr-patch-deploy.yaml
+- path: ./dev-cdr-patch-service.yaml
 images:
 - name: service-image
   newName: amplypower/service/cdr-api
