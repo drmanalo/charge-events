@@ -72,7 +72,7 @@ func (h *Handlers) Liveness(ctx context.Context, w http.ResponseWriter, r *http.
 		GOMAXPROCS: os.Getenv("GOMAXPROCS"),
 	}
 
-	h.log.Info(ctx, "function", "Liveness")
+	h.log.Info(ctx, "Liveness")
 
 	// THIS IS A FREE TIMER. WE COULD UPDATE THE METRIC GOROUTINE COUNT HERE.
 
