@@ -146,5 +146,23 @@ dev-describe-cdr:
 
 # ==============================================================================
 
+metrics-view-sc:
+	expvarmon -ports="$(SERVICE_NAME).$(NAMESPACE).svc.cluster.local:4000" -vars="build,requests,goroutines,errors,panics,mem:memstats.Alloc"
+
+metrics:
+	curl -il $(SERVICE_NAME).$(NAMESPACE).svc.cluster.local:4000/debug/vars
+
+test:
+	curl -il $(SERVICE_NAME).$(NAMESPACE).svc.cluster.local:3000/test
+
+ready:
+	curl -il $(SERVICE_NAME).$(NAMESPACE).svc.cluster.local:3000/readiness
+
+live:
+	curl -il $(SERVICE_NAME).$(NAMESPACE).svc.cluster.local:3000/liveness
+
+
+# ==============================================================================
+
 run:
 	go run app/services/cdr-api/main.go | go run app/tooling/logfmt/main.go
