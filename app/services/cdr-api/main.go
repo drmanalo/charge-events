@@ -13,7 +13,6 @@ import (
 	"time"
 
 	"github.com/ardanlabs/conf/v3"
-	"github.com/ardanlabs/service/foundation/web"
 	"github.com/drmanalo/charge-events/app/services/cdr-api/handlers"
 	"github.com/drmanalo/charge-events/business/sys/logger"
 	"github.com/drmanalo/charge-events/business/web/v1/debug"
@@ -22,11 +21,7 @@ import (
 var build = "develop"
 
 func main() {
-	traceIDFunc := func(ctx context.Context) string {
-		return web.GetTraceID(ctx)
-	}
-
-	log := logger.New(os.Stdout, "CDR-API", traceIDFunc)
+	log := logger.New(os.Stdout, "CDR-API")
 
 	if err := run(log); err != nil {
 		fmt.Println(err)

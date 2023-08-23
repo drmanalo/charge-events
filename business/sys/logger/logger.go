@@ -8,23 +8,18 @@ import (
 	"runtime"
 	"time"
 
-	"github.com/ardanlabs/service/foundation/web"
+	"github.com/drmanalo/charge-events/foundation/web"
 	"golang.org/x/exp/slog"
 )
 
 // Logger represents a logger for logging information
 type Logger struct {
-	handler     slog.Handler
-	traceIDFunc TraceIDFunc
+	handler slog.Handler
 }
 
-// TraceIDFunc represents a function that can return the trace id from
-// the specified context
-type TraceIDFunc func(ctx context.Context) string
-
 // New constructs a new log for application use
-func New(w io.Writer, serviceName string, traceIDFunc TraceIDFunc) *Logger {
-	return new(w, LevelInfo, serviceName, traceIDFunc)
+func New(w io.Writer, serviceName string) *Logger {
+	return new(w, LevelInfo, serviceName)
 }
 
 // Info logs at LevelInfo with the given context
@@ -77,7 +72,7 @@ func (log *Logger) write(ctx context.Context, level Level, caller int, msg strin
 
 // =============================================================================
 
-func new(w io.Writer, minLevel Level, serviceName string, traceIDFunc TraceIDFunc) *Logger {
+func new(w io.Writer, minLevel Level, serviceName string) *Logger {
 
 	// Convert the file name to just the name.ext when this key/value will be logged
 	f := func(groups []string, a slog.Attr) slog.Attr {
@@ -103,7 +98,6 @@ func new(w io.Writer, minLevel Level, serviceName string, traceIDFunc TraceIDFun
 	handler = handler.WithAttrs(attrs)
 
 	return &Logger{
-		handler:     handler,
-		traceIDFunc: traceIDFunc,
+		handler: handler,
 	}
 }
